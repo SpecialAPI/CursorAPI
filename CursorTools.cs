@@ -216,6 +216,19 @@ namespace CursorAPI
         }
 
 		/// <summary>
+		/// Removes <paramref name="element"/> from <paramref name="array"/>.
+		/// </summary>
+		/// <typeparam name="T">The type of the element to remove.</typeparam>
+		/// <param name="array">The array from which <paramref name="element"/> will be removed.</param>
+		/// <param name="element">The element to remove from <paramref name="array"/>.</param>
+		public static void Remove<T>(ref T[] array, T element)
+		{
+			List<T> list = array.ToList();
+			list.Remove(element);
+			array = list.ToArray();
+		}
+
+		/// <summary>
 		/// Converts <paramref name="vector"/> to a <see cref="Vector2Int"/>.
 		/// </summary>
 		/// <param name="vector">The <see cref="IntVector2"/> to convert.</param>

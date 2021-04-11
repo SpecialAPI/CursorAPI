@@ -21,6 +21,8 @@ namespace CursorAPI
             {
                 return;
             }
+            addedCursorLabelTexts = new List<string>();
+            addedCursorTextures = new List<Texture2D>();
             CursorTools.Init();
             ResourceGetter.Init();
             UIRootPrefab = CursorTools.LoadAssetFromAnywhere<GameObject>("UI Root").GetComponent<GameUIRoot>();
@@ -43,6 +45,44 @@ namespace CursorAPI
             if (!m_initialized)
             {
                 return;
+            }
+            if(addedCursorLabelTexts != null)
+            {
+                BraveOptionsMenuItem menu = UIRootPrefab.transform.Find("OptionsMenuPanelDave").Find("CentralOptionsPanel").Find("GameplayOptionsScrollablePanel").Find("CursorSelectorPanel").GetComponent<BraveOptionsMenuItem>();
+                foreach (string str in addedCursorLabelTexts)
+                {
+                    CursorTools.Remove(ref menu.labelOptions, str);
+                }
+                if (GameUIRoot.Instance != null)
+                {
+                    BraveOptionsMenuItem instanceMenu = GameUIRoot.Instance.transform.Find("OptionsMenuPanelDave").Find("CentralOptionsPanel").Find("GameplayOptionsScrollablePanel").Find("CursorSelectorPanel").GetComponent<BraveOptionsMenuItem>();
+                    foreach (string str in addedCursorLabelTexts)
+                    {
+                        CursorTools.Remove(ref instanceMenu.labelOptions, str);
+                    }
+                }
+                addedCursorLabelTexts.Clear();
+                addedCursorLabelTexts = null;
+            }
+            if(addedCursorTextures != null)
+            {
+                foreach(Texture2D texture in addedCursorTextures)
+                {
+                    CursorTools.Remove(ref UIRootPrefab.GetComponentInChildren<GameCursorController>().cursors, texture);
+                }
+                if (GameUIRoot.Instance != null)
+                {
+                    foreach (Texture2D texture in addedCursorTextures)
+                    {
+                        CursorTools.Remove(ref GameUIRoot.Instance.GetComponentInChildren<GameCursorController>().cursors, texture);
+                    }
+                }
+                addedCursorTextures.Clear();
+                addedCursorTextures = null;
+            }
+            if(GameUIRoot.Instance != null && GameUIRoot.Instance.GetComponent<UIRootProcessedFlag>() != null)
+            {
+                UnityEngine.Object.Destroy(GameUIRoot.Instance.GetComponent<UIRootProcessedFlag>());
             }
             CursorTools.Unload();
             ResourceGetter.Unload();
@@ -90,6 +130,10 @@ namespace CursorAPI
         /// <param name="cursorTex">The cursor's texture.</param>
         public static void BuildCursor(Texture2D cursorTex)
         {
+            if(addedCursorTextures == null || addedCursorLabelTexts == null)
+            {
+                Init();
+            }
             CursorTools.Add(ref UIRootPrefab.GetComponentInChildren<GameCursorController>().cursors, cursorTex);
             CursorTools.Add(ref UIRootPrefab.transform.Find("OptionsMenuPanelDave").Find("CentralOptionsPanel").Find("GameplayOptionsScrollablePanel").Find("CursorSelectorPanel").GetComponent<BraveOptionsMenuItem>().labelOptions, "[sprite \"" +
                 cursorTex.name + "\"]");
@@ -100,6 +144,8 @@ namespace CursorAPI
                     cursorTex.name + "\"]");
                 GameUIRoot.Instance.gameObject.GetOrAddComponent<UIRootProcessedFlag>();
             }
+            addedCursorTextures.Add(cursorTex);
+            addedCursorLabelTexts.Add("[sprite \"" + cursorTex.name + "\"]");
             UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(cursorTex);
         }
 
@@ -109,5 +155,7 @@ namespace CursorAPI
         public static GameUIRoot UIRootPrefab;
         private static Hook dfManagerStartHook;
         private static bool m_initialized;
+        private static List<Texture2D> addedCursorTextures;
+        private static List<string> addedCursorLabelTexts;
     }
 }
