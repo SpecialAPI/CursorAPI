@@ -239,6 +239,17 @@ namespace CursorAPI
 		}
 
 		/// <summary>
+		/// Returns <see langword="true"/> if <paramref name="self"/> overlaps with <paramref name="other"/>.
+		/// </summary>
+		/// <param name="self">This <see cref="RectInt"/>.</param>
+		/// <param name="other">The other <see cref="RectInt"/></param>
+		/// <returns><see langword="true"/> if <paramref name="self"/> overlaps with <paramref name="other"/>.</returns>
+		public static bool Overlaps(this RectInt self, RectInt other)
+		{
+			return other.xMax > self.xMin && other.xMin < self.xMax && other.yMax > self.yMin && other.yMin < self.yMax;
+		}
+
+		/// <summary>
 		/// Gets the first empty space in <paramref name="atlas"/> that has at least the size of <paramref name="pixelScale"/>.
 		/// </summary>
 		/// <param name="atlas">The <see cref="dfAtlas"/> to find the empty space in.</param>
@@ -258,7 +269,7 @@ namespace CursorAPI
 				bool shouldContinue = false;
 				foreach (RectInt rint in rects)
 				{
-					if (rint.Contains(point))
+					if (rint.Overlaps(new RectInt(point, pixelScale.ToVector2Int())))
 					{
 						shouldContinue = true;
 						pointIndex++;
@@ -283,7 +294,7 @@ namespace CursorAPI
 						}
 						else
 						{
-							if (currentRect.Contains(rint2.position))
+							if (currentRect.Overlaps(rint2))
 							{
 								shouldContinue = true;
 								shouldBreak = true;
